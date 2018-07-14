@@ -15,6 +15,10 @@ class Todos extends bookshelf.Model {
     return true;
   }
 
+  get hidden() {
+     return ['id','createdAt','updatedAt','isActive']
+  }
+
   hasTodo() {
     return this.belongsToMany(Todo);
   }

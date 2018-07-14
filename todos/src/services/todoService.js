@@ -9,26 +9,16 @@ import Categories from '../models/category';
  * @return {Promise}
  */
 export function getAllTodos(query) {
-    
-    let queryLen = Object.keys(query).length;
 
-    if(queryLen === 1){
+    if(query.title){
 
-        // return new Todo({ title: query.title }).fetch().then(todo => {
-        //     if (!todo) {
-        //         throw new Boom.notFound('Todo not found');
-        //     }
-        //     return todo;
-        // });
-
-        return Todo
-        .query(qb => { 
-            qb.whereRaw('title ILIKE ?',  ['%' + query.title + '%'] );
-            qb.debug(true);
-        })
-        .fetchAll();
+        return Todo.query(qb => { 
+            
+                qb.whereRaw('title ILIKE ?', ['%' + query.title + '%'] );
+            })
+            .fetchAll();
         
-    } else if( queryLen >= 2) {
+    } else if( query.page && query.perpage) {
 
         const offset = (query.page - 1) * query.perpage;
 
@@ -44,6 +34,18 @@ export function getAllTodos(query) {
             }
             return { page: query.page, perpage : query.perpage, data: todo };
         })
+        
+    } else if (query.category_name) {
+
+        // GET TODO BY CATEGORIES
+        return Categories.forge({ name: query.category_name }).fetch({ withRelated :'hasTodo'}).then(todo =>{
+       
+            if(!todo){
+                throw new Boom.notFound('item not found');
+            }
+            return todo;
+        })
+        
     } else {
 
         // return Todo.fetchAll();
@@ -58,27 +60,26 @@ export function getAllTodos(query) {
 /**
  * Get a todo with category name
  * 
- * 
- * 
+ 
  */
-export function getByCategory(query){
+// export function getByCategory(query){
 
-    // return Todo.forge({ id: query.id }).fetch({ withRelated :'hasCategory' }).then(todo =>{
+//     // return Todo.forge({ id: query.id }).fetch({ withRelated :'hasCategory' }).then(todo =>{
        
-    //     if(!todo){
-    //         throw new Boom.notFound('item not found');
-    //     }
-    //     return todo;
-    // })
-
-    return Categories.forge({ name: query.category_name }).fetch({ withRelated :'hasTodo'}).then(todo =>{
+//     //     if(!todo){
+//     //         throw new Boom.notFound('item not found');
+//     //     }
+//     //     return todo;
+//     // })
+//     return Categories.forge({ name: query.category_name }).fetch({ withRelated :'hasTodo'}).then(todo =>{
        
-        if(!todo){
-            throw new Boom.notFound('item not found');
-        }
-        return todo;
-    })
-}
+//         if(!todo){
+//             throw new Boom.notFound('item not found');
+//         }
+//         return todo;
+//     })
+    
+// }
 
 
 /**
@@ -135,5 +136,6 @@ export function updateTodo(id, todo) {
  * @return {Promise}
  */
 export function deleteTodo(id) {
+    
     return new Todo({ id }).fetch().then(todo => todo.destroy());
   }

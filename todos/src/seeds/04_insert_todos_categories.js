@@ -20,6 +20,36 @@ export function seed(knex, Promise) {
             todo_id: 2,
             category_id: 2,
             updated_at: new Date()
+          },
+          {
+            todo_id: 3,
+            category_id: 2,
+            updated_at: new Date()
+          },
+          {
+            todo_id: 4,
+            category_id: 2,
+            updated_at: new Date()
+          },
+          {
+            todo_id: 5,
+            category_id: 1,
+            updated_at: new Date()
+          },
+          {
+            todo_id: 6,
+            category_id: 1,
+            updated_at: new Date()
+          },
+          {
+            todo_id: 7,
+            category_id: 2,
+            updated_at: new Date()
+          },
+          {
+            todo_id: 8,
+            category_id: 1,
+            updated_at: new Date()
           }
         ])
       ]);

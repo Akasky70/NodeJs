@@ -1,5 +1,6 @@
 import Boom from 'boom';
 import User from '../models/user';
+import { generateToken } from '../middlewares/authenticate';
 
 /**
  * Get all users.
@@ -55,4 +56,38 @@ export function updateUser(id, user) {
  */
 export function deleteUser(id) {
   return new User({ id }).fetch().then(user => user.destroy());
+}
+
+/**
+ * Login user date
+ * 
+ * @param {Object} user
+ * @return {Promise} 
+ */
+export function loginUser ( userData ) {
+
+  let bcrypt = require('bcrypt-nodejs');
+  let hash = null; 
+  
+  return User.forge({ email: userData.email })
+    .fetch()
+    .then(user => {
+     
+      if (!user) {
+        throw new Boom.notFound('User not found');
+      }
+      
+      hash = user.get('password');
+
+      if( bcrypt.compareSync( userData.password, hash ) ) {
+
+        let token = generateToken(user);
+        
+        return { token, user };
+       
+      } else {
+
+        throw new Boom.notFound('Password incorrect');
+      }
+    });
 }

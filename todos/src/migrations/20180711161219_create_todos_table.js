@@ -14,6 +14,7 @@ export function up(knex) {
     table.string('description').notNull();
     table.integer('user_id').references('users.id');
     table.boolean('is_completed').notNull();
+    table.boolean('is_active').notNull;
   });
 }
 
