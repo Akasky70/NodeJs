@@ -13,7 +13,10 @@ export function up(knex) {
       .defaultTo(knex.raw('now()'));
     table.timestamp('updated_at').notNull();
     table.string('name').notNull();
-    table.boolean('is_active').notNull();
+    table.string('email').notNull();
+    table.string('password').notNull();
+    table.boolean('refresh_token');
+    table.boolean('is_active').notNull;
   });
 }
 
