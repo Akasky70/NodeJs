@@ -1,0 +1,18 @@
+
+// FOR PAGINATION PAGE
+// export function getTodoPagination(todo) {
+    
+//     const offset = (todo.page - 1)*3;
+//     return Todo.forge()
+//         .query(function(qb){
+
+//             qb.offset(offset).limit(todo.perpage);
+//         })
+//         .orderBy(todo.sortfrom, todo.sortby)
+//         .fetchAll().then(todo => {
+//             if (!todo) {
+//                 throw new Boom.notFound('Todo not found');
+//             }
+//             return todo;
+//         })
+// }

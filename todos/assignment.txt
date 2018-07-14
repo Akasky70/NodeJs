@@ -1,0 +1,10 @@
+@channel: Assignment for today
+1. Implement CRUD for todos
+2. Implement CRUD for categories
+3. Todos can have many categories; Categories can have many todos
+4. Todo must belong to one User
+5. Improve todo listing API
+- Implement filtering based on todo title
+- Implement filtering based on category name
+- Implement sorting
+- Implement pagination (offset, bookself)
