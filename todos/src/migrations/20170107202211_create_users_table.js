@@ -15,7 +15,7 @@ export function up(knex) {
     table.string('name').notNull();
     table.string('email').notNull();
     table.string('password').notNull();
-    table.boolean('refresh_token');
+    table.string('refresh_token');
     table.boolean('is_active').notNull;
   });
 }

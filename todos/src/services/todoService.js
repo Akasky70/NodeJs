@@ -5,18 +5,19 @@ import Categories from '../models/category';
 /**
  * Get all users.
  *
- * @param {Object} query
+ * @param {Object} query 
+ * @param {Object} headers 
  * @return {Promise}
  */
-export function getAllTodos(query) {
+export function getAllTodos( query, headers ) {
 
     if(query.title){
 
         return Todo.query(qb => { 
             
-                qb.whereRaw('title ILIKE ?', ['%' + query.title + '%'] );
-            })
-            .fetchAll();
+            qb.whereRaw('title ILIKE ?', ['%' + query.title + '%'] );
+        })
+        .fetchAll();
         
     } else if( query.page && query.perpage) {
 
@@ -27,6 +28,7 @@ export function getAllTodos(query) {
 
             qb.offset(offset).limit(query.perpage);
         })
+        .where({ user_id: headers.user_id })
         .orderBy(query.sortfrom, query.sortby)
         .fetchAll().then(todo => {
             if (!todo) {
@@ -38,11 +40,14 @@ export function getAllTodos(query) {
     } else if (query.category_name) {
 
         // GET TODO BY CATEGORIES
-        return Categories.forge({ name: query.category_name }).fetch({ withRelated :'hasTodo'}).then(todo =>{
+        return Categories
+            .forge({ name: query.category_name })
+            .fetch({ withRelated :'hasTodo'})
+            .then(todo =>{
        
-            if(!todo){
-                throw new Boom.notFound('item not found');
-            }
+                if(!todo){
+                    throw new Boom.notFound('item not found');
+                }
             return todo;
         })
         
@@ -50,37 +55,13 @@ export function getAllTodos(query) {
 
         // return Todo.fetchAll();
         return new Todo().query(function(qb){
+            qb.where({ user_id: headers.user_id })
             qb.orderBy('title','ASC'); 
         })
         .fetchAll();
     }
 
 }
-
-/**
- * Get a todo with category name
- * 
- 
- */
-// export function getByCategory(query){
-
-//     // return Todo.forge({ id: query.id }).fetch({ withRelated :'hasCategory' }).then(todo =>{
-       
-//     //     if(!todo){
-//     //         throw new Boom.notFound('item not found');
-//     //     }
-//     //     return todo;
-//     // })
-//     return Categories.forge({ name: query.category_name }).fetch({ withRelated :'hasTodo'}).then(todo =>{
-       
-//         if(!todo){
-//             throw new Boom.notFound('item not found');
-//         }
-//         return todo;
-//     })
-    
-// }
-
 
 /**
  * Get a todo.
@@ -109,7 +90,8 @@ export function createTodo(todo) {
         title: todo.title,
         description: todo.description,
         user_id: todo.user_id,
-        is_completed: todo.is_completed
+        is_completed: todo.is_completed,
+        is_active:todo.is_active
     }).save().then(todo => todo.refresh());
 }
 
@@ -125,7 +107,8 @@ export function updateTodo(id, todo) {
         title: todo.title,
         description: todo.description,
         user_id: todo.user_id,
-        is_completed: todo.is_completed
+        is_completed: todo.is_completed,
+        is_active:todo.is_active
     }).then(todo => todo.refresh());
 }
 
@@ -138,4 +121,4 @@ export function updateTodo(id, todo) {
 export function deleteTodo(id) {
     
     return new Todo({ id }).fetch().then(todo => todo.destroy());
-  }
+}
