@@ -6,7 +6,22 @@ const SCHEMA = {
   name: Joi.string()
     .label('Name')
     .max(90)
-    .required()
+    .required(),
+  
+    email: Joi.string()
+    .label('Email')
+    .max(90)
+    .required(),
+
+    password: Joi.string()
+    .label('Password')
+    .max(500)
+    .required(),
+
+    is_active: Joi.string()
+    .label('IsActive')
+    .max(1)
+    .required(),
 };
 
 /**

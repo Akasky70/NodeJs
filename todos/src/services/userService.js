@@ -1,7 +1,8 @@
 import Boom from 'boom';
 import User from '../models/user';
-import { generateToken } from '../middlewares/authenticate';
-
+import bcrypt from 'bcrypt-nodejs';
+import { generateAccessToken, updateRefreshToken } from '../utils/tokensBuilder';
+  
 /**
  * Get all users.
  *
@@ -34,7 +35,15 @@ export function getUser(id) {
  * @return {Promise}
  */
 export function createUser(user) {
-  return new User({ name: user.name }).save().then(user => user.refresh());
+  
+  let hashPassword = bcrypt.hashSync(user.password);
+
+  return new User({ 
+    name: user.name,
+    email: user.email,
+    password: hashPassword,
+    is_active: user.is_active
+  }).save().then(user => user.refresh());
 }
 
 /**
@@ -45,7 +54,17 @@ export function createUser(user) {
  * @return {Promise}
  */
 export function updateUser(id, user) {
-  return new User({ id }).save({ name: user.name }).then(user => user.refresh());
+
+  let hashPassword = bcrypt.hashSync(user.password);
+
+  return new User({ id })
+    .save({ 
+      name: user.name,
+      email: user.email,
+      password: hashPassword,
+      is_active: user.is_active
+
+    }).then(user => user.refresh());
 }
 
 /**
@@ -66,8 +85,7 @@ export function deleteUser(id) {
  */
 export function loginUser ( userData ) {
 
-  let bcrypt = require('bcrypt-nodejs');
-  let hash = null; 
+  let password = null; 
   
   return User.forge({ email: userData.email })
     .fetch()
@@ -77,12 +95,15 @@ export function loginUser ( userData ) {
         throw new Boom.notFound('User not found');
       }
       
-      hash = user.get('password');
+      password = user.get('password');
 
-      if( bcrypt.compareSync( userData.password, hash ) ) {
+      if( bcrypt.compareSync( userData.password, password ) ) {
 
-        let token = generateToken(user);
+        let token = generateAccessToken(user);
         
+        // UPDATES REFRESH TOKEN IN DB
+        updateRefreshToken(user, token.refreshToken )
+
         return { token, user };
        
       } else {
@@ -91,3 +112,14 @@ export function loginUser ( userData ) {
       }
     });
 }
+
+/**
+ * logout user 
+ */
+export function logoutUser (user) {
+
+  return updateRefreshToken( user );
+
+}
+
+
